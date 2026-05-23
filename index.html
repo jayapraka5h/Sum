@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDEVisualizer — Array Summation Visualizer</title>
+  <!-- Google Fonts for Inter and JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Tabler Icons CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    :root {
+      --bg0: #0f1117;
+      --bg1: #161b27;
+      --bg2: #1e2535;
+      --bg3: #252d3d;
+      --border: #2a3347;
+      --border2: #334060;
+      --text1: #e8eaf0;
+      --text2: #8b93a8;
+      --text3: #4a5468;
+      --purple: #a78bfa;
+      --amber: #f59e0b;
+      --red: #f87171;
+      --green: #34d399;
+      --blue: #60a5fa;
+      --purple-bg: rgba(167,139,250,.12);
+      --amber-bg: rgba(245,158,11,.12);
+      --red-bg: rgba(248,113,113,.12);
+      --green-bg: rgba(52,211,153,.1);
+      --blue-bg: rgba(96,165,250,.1);
+      
+      --amber-border: rgba(245,158,11,0.35);
+      --green-border: rgba(52,211,153,0.35);
+      --blue-border: rgba(96,165,250,0.35);
+      --purple-border: rgba(167,139,250,0.35);
+      --ty-color: #fb923c;
+      --console-bg: #090b10;
+      --console-inner-border: #334060;
+
+      --normal: #2a3a5c;
+      --code-font-size: 13px;
+    }
+    body.light-theme {
+      --bg0: #f8fafc;
+      --bg1: #ffffff;
+      --bg2: #f1f5f9;
+      --bg3: #e2e8f0;
+      --border: #e2e8f0;
+      --border2: #cbd5e1;
+      --text1: #0f172a;
+      --text2: #475569;
+      --text3: #94a3b8;
+      --purple: #7c3aed;
+      --amber: #d97706;
+      --red: #dc2626;
+      --green: #16a34a;
+      --blue: #2563eb;
+      --purple-bg: rgba(124, 58, 237, 0.08);
+      --amber-bg: rgba(217, 119, 6, 0.08);
+      --red-bg: rgba(220, 38, 38, 0.08);
+      --green-bg: rgba(22, 163, 74, 0.07);
+      --blue-bg: rgba(37, 99, 235, 0.07);
+      
+      --amber-border: rgba(217, 119, 6, 0.2);
+      --green-border: rgba(22, 163, 74, 0.2);
+      --blue-border: rgba(37, 99, 235, 0.2);
+      --purple-border: rgba(124, 58, 237, 0.2);
+      --ty-color: #c2410c;
+      --console-bg: #f8fafc;
+      --console-inner-border: #cbd5e1;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--bg0);
+      color: var(--text1);
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      transition: background 0.25s, color 0.25s;
+    }
+    .root {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg0);
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      padding: 10px 20px;
+      background: var(--bg1);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .top-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text2);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .top-badges {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .badge {
+      font-size: 13px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      line-height: 1;
+      font-family: 'JetBrains Mono', monospace;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    }
+    .badge-i { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .badge-ok { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-swap { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+    .badge-done { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+
+    .main {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+    .left {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      height: 100%;
+      min-width: 0;
+    }
+    .code-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 0 6px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--code-font-size);
+      line-height: 1.85;
+      padding: 0;
+    }
+    .ln-row {
+      display: flex;
+      align-items: stretch;
+      min-height: 25px;
+      transition: background .15s;
+    }
+    .ln-row.active { background: rgba(245,158,11,.11); }
+    .ln-row.done { background: rgba(52,211,153,.04); }
+    .ln {
+      width: 42px;
+      min-width: 42px;
+      text-align: right;
+      padding-right: 14px;
+      font-size: 11px;
+      color: var(--text3);
+      line-height: 25px;
+      user-select: none;
+      flex-shrink: 0;
+      font-family: inherit;
+    }
+    .ln-row.active .ln { color: var(--amber); }
+    .ln-row.active .lbar { background: var(--amber); }
+    .ln-row.done .lbar { background: var(--green); opacity: .4; }
+    .lbar {
+      width: 2px;
+      background: transparent;
+      flex-shrink: 0;
+    }
+    .lc {
+      padding: 0 16px 0 10px;
+      white-space: pre;
+      color: var(--text1);
+      line-height: 25px;
+      flex: 1;
+      font-family: inherit;
+      font-size: inherit;
+    }
+    .kw { color: var(--purple); font-weight: 500; }
+    .fn { color: var(--blue); }
+    .cm { color: var(--text3); font-style: italic; }
+    .nm { color: var(--amber); }
+    .ty { color: var(--ty-color); }
+
+    .callout-strip {
+      flex-shrink: 0;
+      border-top: 1px solid var(--border);
+      background: var(--bg1);
+      padding: 12px 18px 14px;
+      min-height: 98px;
+    }
+    .callout-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--amber);
+      margin-bottom: 8px;
+    }
+    .callout-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cr {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: opacity .2s, transform .2s;
+    }
+    .cr.show {
+      opacity: 1;
+      transform: none;
+    }
+    .ci {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .ci-exec { background: var(--blue-bg); color: var(--blue); }
+    .ci-store { background: var(--amber-bg); color: var(--amber); }
+    .ci-check { background: var(--red-bg); color: var(--red); }
+    .ci-ok { background: var(--green-bg); color: var(--green); }
+    .ci-swap { background: var(--purple-bg); color: var(--purple); }
+    .ct {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+    .ct b {
+      color: var(--text1);
+      font-weight: 600;
+    }
+
+    .right {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 20px;
+      gap: 12px;
+      background: var(--bg0);
+      height: 100%;
+      min-width: 0;
+      overflow-y: auto;
+    }
+    .vis-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .panel-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--blue);
+    }
+    
+    .console-container {
+      flex: 1;
+      min-height: 200px;
+      max-height: 280px;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+    }
+    .console-window {
+      display: flex;
+      flex-direction: column;
+      background: var(--console-bg);
+      border: 1px solid var(--console-inner-border);
+      border-radius: 6px;
+      height: 100%;
+      flex: 1;
+      overflow: hidden;
+    }
+    .console-header {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--bg1);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .console-dots {
+      display: flex;
+      gap: 6px;
+      margin-right: 14px;
+    }
+    .console-dots .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dot-red { background: #f87171; }
+    .dot-yellow { background: #fbbf24; }
+    .dot-green { background: #34d399; }
+    .console-title {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text3);
+      letter-spacing: .08em;
+    }
+    .console-body {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text1);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .console-line {
+      white-space: pre-wrap;
+      margin-bottom: 4px;
+    }
+    .console-line.prompt {
+      color: var(--blue);
+    }
+    .console-line.output-text {
+      color: var(--green);
+    }
+    .console-input-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--amber);
+      background: var(--amber-bg);
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--amber-border);
+      width: 100%;
+      margin-top: 4px;
+    }
+    .console-input-field {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid var(--amber);
+      color: var(--amber);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      padding: 0 4px;
+      width: 70px;
+      outline: none;
+      font-weight: 600;
+      text-align: center;
+    }
+    .console-input-btn {
+      background: var(--amber);
+      border: none;
+      color: var(--bg0);
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .console-input-btn:hover {
+      background: #fbbf24;
+    }
+    .blinking-cursor {
+      animation: blink 1s step-end infinite;
+      color: var(--amber);
+      font-weight: bold;
+    }
+    @keyframes blink {
+      from, to { opacity: 0 }
+      50% { opacity: 1 }
+    }
+
+    .array-view-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      padding: 24px 0 14px;
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-height: 90px;
+    }
+    .cell-i-pointer {
+      position: absolute;
+      top: -24px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pointer-bounce 0.6s infinite alternate;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .cell-i-pointer::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 3px 3px 0;
+      border-style: solid;
+      display: block;
+      width: 0;
+    }
+    .cell-i-pointer.write-mode {
+      background: var(--amber);
+      color: var(--bg0);
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+    }
+    .cell-i-pointer.write-mode::after {
+      border-color: var(--amber) transparent;
+    }
+    .cell-i-pointer.read-mode {
+      background: var(--green);
+      color: var(--bg0);
+      box-shadow: 0 2px 6px rgba(52, 211, 153, 0.4);
+    }
+    .cell-i-pointer.read-mode::after {
+      border-color: var(--green) transparent;
+    }
+    .cell-i-pointer.default-mode {
+      background: var(--purple);
+      color: var(--bg0);
+      box-shadow: 0 2px 6px rgba(167, 139, 250, 0.4);
+    }
+    .cell-i-pointer.default-mode::after {
+      border-color: var(--purple) transparent;
+    }
+    @keyframes pointer-bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-4px); }
+    }
+    .sum-formula-bubble {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1.5px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--purple);
+      color: var(--bg0);
+      box-shadow: 0 2px 6px rgba(167, 139, 250, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      pointer-events: none;
+      white-space: nowrap;
+      animation: pointer-bounce 0.6s infinite alternate;
+    }
+    .sum-formula-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 3px 3px 0;
+      border-style: solid;
+      border-color: var(--purple) transparent;
+      display: block;
+      width: 0;
+    }
+    .array-unallocated {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text3);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    .array-cell {
+      width: 52px;
+      height: 52px;
+      background: var(--bg2);
+      border: 1.5px solid var(--border2);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .array-cell.default {
+      border: 1.5px dashed var(--border2);
+      background: rgba(255, 255, 255, 0.01);
+    }
+    .array-cell.default .array-cell-val {
+      color: var(--text3);
+    }
+    .array-cell.active-write {
+      border-color: var(--amber);
+      background: rgba(245, 158, 11, 0.15);
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+      transform: translateY(-2px);
+    }
+    .array-cell.active-read {
+      border-color: var(--green);
+      background: rgba(52, 211, 153, 0.15);
+      box-shadow: 0 0 8px rgba(52, 211, 153, 0.35);
+      transform: translateY(-2px);
+    }
+    .array-cell.initialized {
+      border-color: var(--purple);
+      background: rgba(167, 139, 250, 0.08);
+    }
+    .array-cell.initialized .array-cell-val {
+      color: var(--text1);
+    }
+    .array-cell-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text1);
+    }
+    .array-cell-idx {
+      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text3);
+      margin-top: 1px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 2px;
+    }
+    .leg {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text2);
+    }
+    .leg-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .vars-row {
+      display: flex;
+      gap: 8px;
+    }
+    .vc {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 6px;
+      flex: 1;
+      text-align: center;
+      min-width: 0;
+    }
+    .vc-l {
+      font-size: 9.5px;
+      color: var(--text2);
+      margin-bottom: 2px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .vc-v {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text1);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+      min-height: 52px;
+    }
+    .status-box b {
+      color: var(--text1);
+      font-weight: 600;
+    }
+
+    .bot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      background: var(--bg1);
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 7px 14px;
+      font-size: 12.5px;
+      font-weight: 500;
+      border-radius: 8px;
+      border: 1px solid var(--border2);
+      cursor: pointer;
+      background: var(--bg2);
+      color: var(--text1);
+      transition: background .13s, transform .1s, border-color .13s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .btn:hover {
+      background: var(--bg3);
+      border-color: var(--border);
+    }
+    .btn:active {
+      transform: scale(.97);
+    }
+    .btn:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-next {
+      background: var(--text1);
+      color: var(--bg0);
+      border-color: var(--text1);
+    }
+    .btn-next:hover {
+      opacity: .9;
+      background: var(--text1);
+    }
+
+    .prog-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 110px;
+      max-width: 220px;
+    }
+    .prog-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 2px;
+      transition: width .2s;
+    }
+    .prog-label {
+      font-size: 10px;
+      color: var(--text3);
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Range slider custom visual styling */
+    input[type="range"] {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      appearance: none;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--purple);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.3);
+    }
+    
+    input[type="text"] {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text1);
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--purple);
+      box-shadow: 0 0 0 1px var(--purple);
+    }
+    
+    .btn-fs {
+      background: transparent;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: bold;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .btn-fs:hover {
+      background: var(--bg3);
+      color: var(--text1);
+    }
+    
+    @media (max-width: 768px) {
+      html, body {
+        overflow-y: auto !important;
+        height: auto !important;
+      }
+      .root {
+        height: auto !important;
+        overflow: visible !important;
+      }
+      .main {
+        flex-direction: column !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      .left {
+        width: 100% !important;
+        height: auto !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border) !important;
+        overflow: visible !important;
+      }
+      .right {
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        padding: 16px 14px !important;
+      }
+      .code-scroll {
+        max-height: 320px !important;
+        overflow-y: auto !important;
+      }
+      .console-container {
+        max-height: 240px !important;
+      }
+      .bot {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 14px !important;
+        padding: 16px 14px !important;
+      }
+      .bot > div {
+        width: 100% !important;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+      }
+      .prog-wrap {
+        max-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="root">
+  <div class="top-bar">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <span class="top-title">IDEVisualizer — Array Summation Visualizer</span>
+      <div style="display: flex; align-items: center; gap: 4px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 2px 4px;">
+        <button class="btn-fs" onclick="changeFontSize(-1)" title="Decrease Code Font Size"><i class="ti ti-minus"></i></button>
+        <span id="fs-label" style="font-size: 10.5px; color: var(--text1); font-family: 'JetBrains Mono', monospace; min-width: 32px; text-align: center; user-select: none;">13px</span>
+        <button class="btn-fs" onclick="changeFontSize(1)" title="Increase Code Font Size"><i class="ti ti-plus"></i></button>
+      </div>
+    </div>
+    <div class="top-badges" id="topBadges"></div>
+    <div style="display: flex; align-items: center; gap: 8px; z-index: 10;">
+      <button class="btn" id="themeToggleBtn" onclick="toggleTheme()" style="padding: 4px 10px; font-size: 11px; border-color: var(--border2); background: var(--bg2); color: var(--text1); height: 26px;" title="Toggle Light/Dark Theme">
+        <i id="themeToggleIcon" class="ti ti-sun" style="font-size:12px; vertical-align:-1px;"></i>
+        <span id="themeToggleText" style="font-weight: 600;">Light Mode</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="left">
+      <div class="panel-header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: var(--bg1); border-bottom: 1px solid var(--border); flex-shrink: 0;">
+        <span class="panel-title">Java Source Code</span>
+      </div>
+      <div class="code-scroll" id="codeScroll"></div>
+      <div class="callout-strip">
+        <div class="callout-label">what's happening here</div>
+        <div class="callout-rows" id="calloutRows"></div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="vis-label">Console Terminal (System.out / System.in)</div>
+      <div class="console-container">
+        <div class="console-window">
+          <div class="console-header">
+            <div class="console-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <span class="console-title">Console Terminal</span>
+          </div>
+          <div class="console-body" id="consoleBody"></div>
+        </div>
+      </div>
+
+      <div class="vis-label">Array State (ar) & Accumulator (sum)</div>
+      <div class="array-view-wrap" id="arrayView"></div>
+
+      <div class="legend">
+        <div class="leg"><div class="leg-dot" style="border:1.5px dashed var(--border); opacity:0.4"></div>null</div>
+        <div class="leg"><div class="leg-dot" style="background:rgba(255,255,255,0.01); border:1.5px dashed var(--border2)"></div>default (0)</div>
+        <div class="leg"><div class="leg-dot" style="background:rgba(245,158,11,0.15); border:1.5px solid var(--amber)"></div>writing / active</div>
+        <div class="leg"><div class="leg-dot" style="background:rgba(52,211,153,0.15); border:1.5px solid var(--green)"></div>reading / printing</div>
+        <div class="leg"><div class="leg-dot" style="background:rgba(167,139,250,0.08); border:1.5px solid var(--purple)"></div>initialized</div>
+      </div>
+
+      <div class="vars-row">
+        <div class="vc"><div class="vc-l">i (loop counter)</div><div class="vc-v" id="vI">—</div></div>
+        <div class="vc"><div class="vc-l">sum</div><div class="vc-v" id="vSum">—</div></div>
+        <div class="vc"><div class="vc-l">ar[i]</div><div class="vc-v" id="vVal">—</div></div>
+        <div class="vc"><div class="vc-l">ar.length</div><div class="vc-v" id="vLen">—</div></div>
+        <div class="vc"><div class="vc-l">scan status</div><div class="vc-v" id="vScan">—</div></div>
+      </div>
+
+      <div class="status-box" id="statusBox">Press <b>Next</b> to begin stepping.</div>
+    </div>
+  </div>
+
+  <div class="bot">
+    <!-- Playback Navigation Panel -->
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <button class="btn" id="resetBtn" onclick="reset()" title="Reset to start"><i class="ti ti-refresh" aria-hidden="true" style="font-size:13px;vertical-align:-1px;"></i>Reset</button>
+      <button class="btn" id="prevBtn" onclick="prev()" title="Previous Step"><i class="ti ti-chevron-left" aria-hidden="true" style="font-size:13px;vertical-align:-1px;"></i>Prev</button>
+      <button class="btn" id="autoBtn" onclick="toggleAuto()" title="Auto Play / Pause"><i class="ti ti-player-play" aria-hidden="true" style="font-size:13px;vertical-align:-1px;"></i>Auto</button>
+      <button class="btn btn-next" id="nextBtn" onclick="step()" title="Next Step">Next <i class="ti ti-chevron-right" aria-hidden="true" style="font-size:13px;vertical-align:-1px"></i></button>
+    </div>
+
+    <!-- Delay Speed Configuration -->
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size:10.5px; color:var(--text3); text-transform:uppercase; letter-spacing:0.05em; font-weight:700;">Speed:</span>
+      <input type="range" id="speedSlider" min="100" max="2000" step="50" value="800" oninput="changeSpeed(this.value)" style="width: 80px; accent-color: var(--purple); cursor: pointer;">
+      <span id="speedVal" style="font-family: 'JetBrains Mono', monospace; font-size:11px; color:var(--text2); min-width: 48px;">800ms</span>
+    </div>
+
+    <!-- Algorithm Progress Slider -->
+    <div class="prog-wrap">
+      <div class="prog-track"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+      <div class="prog-label" id="progLabel">Step 0 / —</div>
+    </div>
+
+    <!-- Dynamic Array Input & Randomizer -->
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <span style="font-size:10.5px; color:var(--text3); text-transform:uppercase; letter-spacing:0.05em; font-weight:700;">Predefined:</span>
+        <input type="text" id="predefinedInputs" value="10, 20, 30, 40, 50" style="width: 130px;" title="Comma separated 5 integer values for simulated scanner">
+        <button class="btn" id="applyBtn" onclick="applyCustomInputs()" style="padding: 5px 10px; font-size: 11px; border-color: var(--border2);" title="Apply Predefined Values">Apply</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 4px; margin-left: 4px;">
+        <input type="checkbox" id="interactiveMode" onchange="toggleInteractiveMode(this.checked)" style="accent-color: var(--amber); width:14px; height:14px; cursor:pointer;">
+        <label for="interactiveMode" style="font-size:11.5px; color:var(--text2); cursor:pointer; user-select:none;">Interactive Console Input</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CODE = [
+  { c: '<span class="kw">import</span> java.util.*;' },
+  { c: '<span class="cm">//Given an array of n integers. </span>' },
+  { c: '<span class="cm">//Write a program to print the sum of all elements present in the array</span>' },
+  { c: '<span class="kw">class</span> <span class="ty">sum</span> {' },
+  { c: '  <span class="kw">static void</span> <span class="fn">printSum</span>(<span class="kw">int</span>[] ar) {', key: 'printSum_entry' },
+  { c: '    <span class="kw">int</span> sum = <span class="nm">0</span>;', key: 'sum_init' },
+  { c: '    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">0</span>; i &lt; ar.length; i++)', key: 'loop2_init' },
+  { c: '    {', key: 'loop2_brace' },
+  { c: '      sum += ar[i];', key: 'loop2_add' },
+  { c: '    }', key: 'loop2_end' },
+  { c: '    <span class="ty">System</span>.out.println(sum);', key: 'printSum_out' },
+  { c: '  }' },
+  { c: '}' },
+  { c: '' },
+  { c: '<span class="kw">public class</span> <span class="ty">A06</span> {' },
+  { c: '  <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {', key: 'main' },
+  { c: '    <span class="ty">Scanner</span> scan = <span class="kw">new</span> <span class="ty">Scanner</span>(<span class="ty">System</span>.in);', key: 'scanner' },
+  { c: '' },
+  { c: '    <span class="kw">int</span>[] ar = <span class="kw">new</span> <span class="kw">int</span>[<span class="nm">5</span>];', key: 'alloc' },
+  { c: '    ' },
+  { c: '    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="nm">0</span>; i &lt; ar.length; i++)', key: 'loop1_init' },
+  { c: '    {', key: 'loop1_brace' },
+  { c: '      <span class="ty">System</span>.out.print(<span class="nm">"Enter the "</span> + i + <span class="nm">" number "</span>);', key: 'loop1_print' },
+  { c: '      ar[i] = scan.nextInt();', key: 'loop1_input' },
+  { c: '    }', key: 'loop1_end' },
+  { c: '    <span class="ty">sum</span>.printSum(ar);', key: 'call_printSum' },
+  { c: '  }' },
+  { c: '}', key: 'class_end' }
+];
+
+const LN = {};
+CODE.forEach((l, i) => { if(l.key) LN[l.key] = i; });
+
+let inputs = [10, 20, 30, 40, 50];
+let steps = [], cur = 0, autoTimer = null, autoOn = false, delay = 800;
+let currentFontSize = 13;
+let isInteractive = false;
+
+function buildCode() {
+  document.getElementById('codeScroll').innerHTML = '<pre>' +
+    CODE.map((l, i) => `<div class="ln-row" id="ln${i}"><span class="ln">${i+1}</span><span class="lbar"></span><span class="lc">${l.c||' '}</span></div>`).join('') +
+  '</pre>';
+}
+
+function hl(idx, doneSet) {
+  CODE.forEach((_, i) => {
+    const el = document.getElementById('ln'+i);
+    if(el) {
+      el.classList.remove('active', 'done');
+      if(doneSet.has(i)) el.classList.add('done');
+    }
+  });
+  if(idx >= 0) {
+    const el = document.getElementById('ln'+idx);
+    if(el) {
+      el.classList.add('active');
+      el.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    }
+  }
+}
+
+function drawArrayView(arr, cellStatuses, activeCell, cellAction, loopI, sumVal, sumAction) {
+  const wrap = document.getElementById('arrayView');
+  if (!arr) {
+    wrap.innerHTML = `
+      <div class="array-unallocated">
+        <i class="ti ti-database-off" style="font-size:24px; color:var(--text3); margin-bottom:6px;"></i>
+        <span>ar is null (unallocated)</span>
+      </div>`;
+    return;
+  }
+
+  let html = arr.map((val, idx) => {
+    let status = cellStatuses[idx];
+    let cls = '';
+    
+    if (idx === activeCell) {
+      if (cellAction === 'writing') {
+        cls = 'active-write';
+      } else if (cellAction === 'reading' || cellAction === 'printing') {
+        cls = 'active-read';
+      }
+    } else {
+      if (status === 'default') cls = 'default';
+      else if (status === 'initialized') cls = 'initialized';
+    }
+
+    let pointerHtml = '';
+    if (typeof loopI === 'number' && idx === loopI) {
+      let pointerClass = 'default-mode';
+      if (idx === activeCell) {
+        if (cellAction === 'writing') {
+          pointerClass = 'write-mode';
+        } else if (cellAction === 'reading' || cellAction === 'printing') {
+          pointerClass = 'read-mode';
+        }
+      }
+      pointerHtml = `<div class="cell-i-pointer ${pointerClass}">i = ${idx}</div>`;
+    }
+
+    return `
+      <div class="array-cell ${cls}">
+        ${pointerHtml}
+        <span class="array-cell-val">${status === 'unallocated' ? '—' : val}</span>
+        <span class="array-cell-idx">[${idx}]</span>
+      </div>`;
+  }).join('');
+
+  if (sumVal !== undefined) {
+    let sumCls = 'default';
+    if (sumVal !== '—') {
+      if (sumAction === 'writing') {
+        sumCls = 'active-write';
+      } else if (sumAction === 'reading') {
+        sumCls = 'active-read';
+      } else {
+        sumCls = 'initialized';
+      }
+    }
+    html += `
+      <div style="display: flex; align-items: center; gap: 8px; margin-left: 10px;">
+        <div style="font-size: 16px; color: var(--text3); font-weight: 600;">=</div>
+        <div class="array-cell ${sumCls}">
+          <span class="array-cell-val" style="color: var(--purple); font-weight: 800;">${sumVal}</span>
+          <span class="array-cell-idx" style="color: var(--purple); font-weight: 600;">sum</span>
+        </div>
+      </div>
+    `;
+  }
+
+  wrap.innerHTML = html;
+}
+
+function drawConsole(lines, awaitingInput, inputIndex) {
+  const body = document.getElementById('consoleBody');
+  body.innerHTML = '';
+
+  lines.forEach(l => {
+    const div = document.createElement('div');
+    div.className = 'console-line';
+    
+    if (l.startsWith('Enter the')) {
+      div.className += ' prompt';
+    } else if ((l.endsWith(' ') || (!isNaN(l.trim()) && l.trim() !== '')) && !l.startsWith('Scanner') && !l.startsWith('Ready')) {
+      div.className += ' output-text';
+    }
+    
+    div.textContent = l;
+    body.appendChild(div);
+  });
+
+  if (awaitingInput) {
+    const row = document.createElement('div');
+    row.className = 'console-input-row';
+    row.innerHTML = `
+      <span>Enter number for ar[${inputIndex}]:</span> 
+      <input type="number" id="manualConsoleInput" class="console-input-field" autofocus onkeydown="handleManualInputKey(event)">
+      <button onclick="submitManualInput()" class="console-input-btn">Submit</button>
+    `;
+    body.appendChild(row);
+    // Autofocus input
+    setTimeout(() => {
+      const input = document.getElementById('manualConsoleInput');
+      if (input) input.focus();
+    }, 50);
+  } else {
+    if (cur < steps.length - 1 && steps[cur].line !== LN['scanner']) {
+      const cursorLine = document.createElement('div');
+      cursorLine.className = 'console-line';
+      cursorLine.innerHTML = `<span style="color:var(--text3)">$ </span><span class="blinking-cursor">▋</span>`;
+      body.appendChild(cursorLine);
+    }
+  }
+
+  body.scrollTop = body.scrollHeight;
+}
+
+function setCallouts(rows) {
+  const wrap = document.getElementById('calloutRows');
+  wrap.innerHTML = rows.map(r => `
+    <div class="cr">
+      <div class="ci ${r.icon}"><i class="ti ${r.ti}" aria-hidden="true" style="font-size:10px"></i></div>
+      <div class="ct">${r.text}</div>
+    </div>`).join('');
+  requestAnimationFrame(() => {
+    wrap.querySelectorAll('.cr').forEach((el, i) => setTimeout(() => el.classList.add('show'), i*70));
+  });
+}
+
+function buildSteps() {
+  const S = [];
+  const n = 5;
+
+  let currentConsole = [];
+  let currentArr = null;
+  let activeIndex = '—';
+  let arLength = '—';
+  let cellStatuses = ['unallocated', 'unallocated', 'unallocated', 'unallocated', 'unallocated'];
+  let currentSum = '—';
+  let currentFormula = '';
+  
+  const pushState = (key, msg, badges, callouts, overrides = {}) => {
+    S.push({
+      line: LN[key] ?? -1,
+      arr: currentArr ? [...currentArr] : null,
+      cellStatuses: [...cellStatuses],
+      i: activeIndex,
+      arLength: arLength,
+      sum: currentSum,
+      sumFormula: currentFormula,
+      console: [...currentConsole],
+      msg: msg,
+      badges: badges || [],
+      callouts: callouts || [],
+      ...overrides
+    });
+  };
+
+  // 1. Entry
+  pushState('main', 
+    'Starting program execution. The JVM invokes the <code>main</code> method.',
+    [],
+    [{ icon: 'ci-exec', ti: 'ti-player-play', text: '<b>Program started:</b> Click Next to initialize scanner.' }]
+  );
+
+  // 2. Scanner init
+  currentConsole.push('Scanner initialized. Ready for inputs.');
+  pushState('scanner',
+    'Initialize <code>Scanner scan = new Scanner(System.in);</code> to read standard input stream.',
+    [{ c: 'badge-ok', t: 'scan = Connected' }],
+    [
+      { icon: 'ci-store', ti: 'ti-variable', text: '<b>Scanner created:</b> Object reference bound to System.in.' },
+      { icon: 'ci-ok', ti: 'ti-check', text: 'Console ready to receive user integer inputs.' }
+    ]
+  );
+  currentConsole = [];
+
+  // 3. Array allocation
+  currentArr = [0, 0, 0, 0, 0];
+  arLength = 5;
+  cellStatuses = ['default', 'default', 'default', 'default', 'default'];
+  pushState('alloc',
+    'Declare and instantiate array variable <code>ar</code>. Memory for 5 elements is allocated on the heap, all default initialized to 0.',
+    [{ c: 'badge-i', t: 'ar = 0x5f2b' }, { c: 'badge-ok', t: 'ar.length = 5' }],
+    [
+      { icon: 'ci-store', ti: 'ti-variable', text: '<b>Variable ar:</b> int[] reference pointing to heap address 0x5f2b.' },
+      { icon: 'ci-box', ti: 'ti-box', text: '<b>Memory allocated:</b> 5 integer slots initialized to default value 0.' }
+    ]
+  );
+
+  // 4. Input Loop
+  activeIndex = 0;
+  pushState('loop1_init',
+    'Input Loop: Initialize loop counter index variable <code>i = 0</code>. Evaluate condition <code>i < ar.length</code> (0 < 5) which is true.',
+    [{ c: 'badge-i', t: 'i = 0' }],
+    [{ icon: 'ci-exec', ti: 'ti-player-play', text: '<b>Loop 1:</b> Initialized i = 0. Entering loop body.' }]
+  );
+
+  let firstUnresolved = -1;
+
+  for (let i = 0; i < n; i++) {
+    activeIndex = i;
+    // Brace line
+    pushState('loop1_brace',
+      `Enter loop body for <code>i = ${i}</code>.`,
+      [{ c: 'badge-i', t: `i = ${i}` }],
+      [{ icon: 'ci-exec', ti: 'ti-code', text: `Executing block for i = ${i}` }]
+    );
+
+    // Print prompt statement
+    const promptText = `Enter the ${i} number `;
+    currentConsole.push(promptText);
+    
+    pushState('loop1_print',
+      `Execute print statement. Outputs prompt string: <code>"Enter the ${i} number "</code> to console.`,
+      [{ c: 'badge-i', t: `i = ${i}` }],
+      [
+        { icon: 'ci-exec', ti: 'ti-terminal-2', text: `<b>Console print:</b> "Enter the ${i} number "` },
+        { icon: 'ci-ok', ti: 'ti-arrow-narrow-right', text: 'System waits for input at scan.nextInt().' }
+      ],
+      { activeCell: i, cellAction: 'printing' }
+    );
+
+    // Check if we have input value
+    const val = inputs[i];
+    if (val === undefined) {
+      pushState('loop1_input',
+        `Program is blocked waiting for user input at <code>scan.nextInt()</code>. Please enter an integer in the console terminal.`,
+        [{ c: 'badge-swap', t: `ar[${i}] = ?` }],
+        [
+          { icon: 'ci-check', ti: 'ti-help', text: `<b>Awaiting Input:</b> Input integer for index ${i}.` }
+        ],
+        { activeCell: i, cellAction: 'writing', awaitingInput: true, inputIndex: i }
+      );
+      firstUnresolved = i;
+      break;
+    }
+
+    currentArr[i] = val;
+    currentConsole[currentConsole.length - 1] = promptText + val;
+    cellStatuses[i] = 'initialized';
+
+    pushState('loop1_input',
+      `Scanner reads next token. <code>scan.nextInt()</code> retrieves value <b>${val}</b>. Assigned to <code>ar[${i}]</code>.`,
+      [{ c: 'badge-swap', t: `ar[${i}] = ${val}` }],
+      [
+        { icon: 'ci-swap', ti: 'ti-arrow-down-right', text: `<b>Writing:</b> ar[${i}] = ${val}` },
+        { icon: 'ci-store', ti: 'ti-variable', text: `Heap array slot at index ${i} is updated.` }
+      ],
+      { activeCell: i, cellAction: 'writing', finalVal: val }
+    );
+
+    // End of loop body, increment i
+    if (i < n - 1) {
+      activeIndex = i + 1;
+      pushState('loop1_end',
+        `Reached end of loop body. Index <code>i</code> increments to <b>${i + 1}</b>. Loop continues.`,
+        [{ c: 'badge-i', t: `i = ${i + 1}` }],
+        [{ icon: 'ci-exec', ti: 'ti-player-track-next', text: `i++ evaluated. Checking loop condition: ${i + 1} < 5 (true)` }]
+      );
+    }
+  }
+
+  if (firstUnresolved !== -1) {
+    return S;
+  }
+
+  // Loop finished condition evaluation
+  activeIndex = 5;
+  pushState('loop1_init',
+    'Loop Condition Check: Evaluate condition <code>i < ar.length</code> (5 < 5) which is false. Terminate input loop.',
+    [{ c: 'badge-ok', t: 'i = 5 (loop terminates)' }],
+    [{ icon: 'ci-exec', ti: 'ti-player-skip-forward', text: 'Condition 5 < 5 is false. Control exits input loop.' }]
+  );
+
+  // Call sum.printSum(ar)
+  activeIndex = '—';
+  pushState('call_printSum',
+    'Call static method <code>sum.printSum(ar)</code> passing array reference <code>ar</code>.',
+    [{ c: 'badge-i', t: 'ar = 0x5f2b' }],
+    [{ icon: 'ci-exec', ti: 'ti-arrow-up-right', text: '<b>Method Call:</b> sum.printSum(ar). Stack frame pushed.' }]
+  );
+
+  // Enter printSum_entry
+  currentFormula = 'sum';
+  pushState('printSum_entry',
+    'Enter <code>sum.printSum</code> method. Local parameter <code>ar</code> references the array on the heap.',
+    [{ c: 'badge-i', t: 'ar = 0x5f2b' }],
+    [{ icon: 'ci-exec', ti: 'ti-code', text: 'Control moves to sum.printSum method.' }]
+  );
+
+  // Initialize sum = 0
+  currentSum = 0;
+  currentFormula = 'sum = 0';
+  pushState('sum_init',
+    'Initialize local accumulator variable <code>sum = 0</code>.',
+    [{ c: 'badge-ok', t: 'sum = 0' }],
+    [{ icon: 'ci-store', ti: 'ti-variable', text: '<b>sum initialized:</b> sum is set to 0.' }],
+    { sumAction: 'writing' }
+  );
+
+  // Loop 2 (Accumulation Loop)
+  activeIndex = 0;
+  currentFormula = 'sum';
+  pushState('loop2_init',
+    'Sum Loop: Initialize loop counter index variable <code>i = 0</code>. Evaluate condition <code>i < ar.length</code> (0 < 5) which is true.',
+    [{ c: 'badge-i', t: 'i = 0' }, { c: 'badge-ok', t: 'sum = 0' }],
+    [{ icon: 'ci-exec', ti: 'ti-player-play', text: '<b>Loop 2:</b> Initialized i = 0. Entering summation loop.' }]
+  );
+
+  for (let i = 0; i < n; i++) {
+    activeIndex = i;
+    // Brace
+    currentFormula = 'sum';
+    pushState('loop2_brace',
+      `Enter summation loop body for <code>i = ${i}</code>.`,
+      [{ c: 'badge-i', t: `i = ${i}` }, { c: 'badge-ok', t: `sum = ${currentSum}` }],
+      [{ icon: 'ci-exec', ti: 'ti-code', text: `Executing block for i = ${i}` }]
+    );
+
+    // Sum addition
+    const prevSum = currentSum;
+    const arrayVal = currentArr[i];
+    currentSum = prevSum + arrayVal;
+    currentFormula = `${prevSum} + ${arrayVal}`;
+
+    pushState('loop2_add',
+      `Add value of <code>ar[${i}]</code> (<b>${arrayVal}</b>) to <code>sum</code>. New value is <b>${currentSum}</b>.`,
+      [{ c: 'badge-ok', t: `sum = ${currentSum}` }],
+      [
+        { icon: 'ci-check', ti: 'ti-arrow-up-right', text: `<b>Reading:</b> Read ar[${i}] = ${arrayVal} from memory.` },
+        { icon: 'ci-swap', ti: 'ti-plus', text: `<b>Adding:</b> sum updated: ${prevSum} + ${arrayVal} = ${currentSum}` }
+      ],
+      { activeCell: i, cellAction: 'reading', sumAction: 'writing' }
+    );
+
+    // Increment i
+    if (i < n - 1) {
+      activeIndex = i + 1;
+      currentFormula = 'sum';
+      pushState('loop2_end',
+        `Reached end of printSum loop body. Index <code>i</code> increments to <b>${i + 1}</b>. Loop continues.`,
+        [{ c: 'badge-i', t: `i = ${i + 1}` }, { c: 'badge-ok', t: `sum = ${currentSum}` }],
+        [{ icon: 'ci-exec', ti: 'ti-player-track-next', text: `i++ evaluated. Checking loop condition: ${i + 1} < 5 (true)` }]
+      );
+    }
+  }
+
+  // Loop 2 condition check terminates
+  activeIndex = 5;
+  currentFormula = 'sum';
+  pushState('loop2_init',
+    'Loop Condition Check: Evaluate condition <code>i < ar.length</code> (5 < 5) which is false. Terminate accumulation loop.',
+    [{ c: 'badge-ok', t: 'i = 5 (loop terminates)' }, { c: 'badge-ok', t: `sum = ${currentSum}` }],
+    [{ icon: 'ci-exec', ti: 'ti-player-skip-forward', text: 'Condition 5 < 5 is false. Exiting loop body.' }]
+  );
+
+  // Print sum
+  currentConsole.push(currentSum.toString());
+  activeIndex = '—';
+  currentFormula = 'print(sum)';
+  pushState('printSum_out',
+    `Execute print statement. Outputs sum value <b>${currentSum}</b> to console.`,
+    [{ c: 'badge-ok', t: `sum = ${currentSum}` }],
+    [
+      { icon: 'ci-exec', ti: 'ti-terminal-2', text: `<b>Console print:</b> "${currentSum}"` },
+      { icon: 'ci-ok', ti: 'ti-check', text: 'Output stream flushed.' }
+    ],
+    { sumAction: 'reading' }
+  );
+
+  // Return to caller
+  currentFormula = '';
+  pushState('call_printSum',
+    'Static method <code>sum.printSum(ar)</code> completes execution. Control returns to <code>main</code>.',
+    [{ c: 'badge-done', t: 'method done' }],
+    [{ icon: 'ci-exec', ti: 'ti-arrow-down-left', text: 'Pop printSum stack frame. Return to main caller.' }]
+  );
+
+  // Class end
+  pushState('class_end',
+    'Main method exits. Program execution completes successfully.',
+    [{ c: 'badge-done', t: 'done ✓' }],
+    [
+      { icon: 'ci-ok', ti: 'ti-circle-check', text: '<b>Finished:</b> Thread main terminates.' },
+      { icon: 'ci-store', ti: 'ti-info-circle', text: 'Array and Scanner references are dereferenced.' }
+    ]
+  );
+
+  return S;
+}
+
+function render() {
+  const s = steps[cur];
+  if (!s) return;
+
+  const doneSet = new Set(steps.slice(0, cur).map(x => x.line).filter(x => x >= 0));
+  hl(s.line, doneSet);
+  
+  drawArrayView(s.arr, s.cellStatuses, s.activeCell !== undefined ? s.activeCell : -1, s.cellAction, s.i, s.sum, s.sumAction);
+  drawConsole(s.console, s.awaitingInput, s.inputIndex);
+  
+  document.getElementById('statusBox').innerHTML = s.msg;
+  document.getElementById('topBadges').innerHTML = (s.badges || []).map(b => `<span class="badge ${b.c}">${b.t}</span>`).join('');
+  
+  document.getElementById('vI').textContent = s.i;
+  document.getElementById('vLen').textContent = s.arLength;
+  
+  // Show ar[i] properly in variables row
+  if (typeof s.i === 'number' && s.arr) {
+    document.getElementById('vVal').textContent = s.arr[s.i];
+  } else {
+    document.getElementById('vVal').textContent = '—';
+  }
+
+  // Show sum properly in variables row
+  if (s.sum !== undefined) {
+    document.getElementById('vSum').textContent = s.sum;
+  } else {
+    document.getElementById('vSum').textContent = '—';
+  }
+
+  // Scanner status watch
+  if (s.awaitingInput) {
+    document.getElementById('vScan').textContent = 'Awaiting Input';
+    document.getElementById('vScan').style.color = 'var(--amber)';
+  } else if (cur >= steps.length - 2) {
+    document.getElementById('vScan').textContent = 'Closed';
+    document.getElementById('vScan').style.color = 'var(--text3)';
+  } else if (s.arLength === '—') {
+    document.getElementById('vScan').textContent = 'Disconnected';
+    document.getElementById('vScan').style.color = 'var(--text3)';
+  } else {
+    document.getElementById('vScan').textContent = 'Connected';
+    document.getElementById('vScan').style.color = 'var(--green)';
+  }
+
+  // Handle buttons based on input block
+  if (s.awaitingInput) {
+    stopAuto();
+    document.getElementById('nextBtn').disabled = true;
+    document.getElementById('autoBtn').disabled = true;
+    document.getElementById('prevBtn').disabled = false;
+  } else {
+    document.getElementById('prevBtn').disabled = (cur === 0);
+    document.getElementById('nextBtn').disabled = (cur === steps.length - 1);
+    document.getElementById('autoBtn').disabled = (cur === steps.length - 1);
+  }
+
+  const pct = steps.length > 1 ? Math.round((cur / (steps.length - 1)) * 100) : 0;
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = `Step ${cur} / ${steps.length - 1}`;
+  
+  setCallouts(s.callouts || []);
+  if (cur === steps.length - 1) stopAuto();
+}
+
+function step() {
+  if (cur < steps.length - 1) {
+    cur++;
+    render();
+  }
+}
+
+function prev() {
+  if (cur > 0) {
+    cur--;
+    render();
+  }
+}
+
+function reset() {
+  stopAuto();
+  cur = 0;
+  steps = buildSteps();
+  render();
+}
+
+function toggleAuto() {
+  autoOn ? stopAuto() : startAuto();
+}
+
+function startAuto() {
+  if (cur >= steps.length - 1) return;
+  autoOn = true;
+  document.getElementById('autoBtn').innerHTML = '<i class="ti ti-player-pause" aria-hidden="true" style="font-size:13px;vertical-align:-1px;margin-right:4px;"></i>Pause';
+  autoTimer = setInterval(() => {
+    if (cur < steps.length - 1) {
+      cur++;
+      render();
+    } else {
+      stopAuto();
+    }
+  }, delay);
+}
+
+function stopAuto() {
+  autoOn = false;
+  clearInterval(autoTimer);
+  document.getElementById('autoBtn').innerHTML = '<i class="ti ti-player-play" aria-hidden="true" style="font-size:13px;vertical-align:-1px;margin-right:4px;"></i>Auto';
+}
+
+function changeSpeed(val) {
+  delay = parseInt(val);
+  document.getElementById('speedVal').textContent = val + 'ms';
+  if (autoOn) {
+    stopAuto();
+    startAuto();
+  }
+}
+
+function changeFontSize(dir) {
+  currentFontSize += dir;
+  if (currentFontSize < 10) currentFontSize = 10;
+  if (currentFontSize > 20) currentFontSize = 20;
+  document.documentElement.style.setProperty('--code-font-size', currentFontSize + 'px');
+  document.getElementById('fs-label').textContent = currentFontSize + 'px';
+}
+
+function applyCustomInputs() {
+  if (isInteractive) {
+    alert("Please disable Interactive Mode to configure predefined inputs.");
+    return;
+  }
+  const inputStr = document.getElementById('predefinedInputs').value;
+  const parsed = inputStr.split(',')
+    .map(x => parseInt(x.trim()))
+    .filter(x => !isNaN(x));
+
+  if (parsed.length < 5) {
+    alert("Please enter at least 5 comma-separated integer values.");
+    return;
+  }
+  
+  inputs = parsed.slice(0, 5);
+  reset();
+}
+
+function toggleInteractiveMode(checked) {
+  isInteractive = checked;
+  const predefinedField = document.getElementById('predefinedInputs');
+  const applyButton = document.getElementById('applyBtn');
+  
+  if (isInteractive) {
+    predefinedField.value = 'Manual console inputs';
+    predefinedField.disabled = true;
+    applyButton.disabled = true;
+    inputs = [undefined, undefined, undefined, undefined, undefined];
+  } else {
+    predefinedField.disabled = false;
+    applyButton.disabled = false;
+    predefinedField.value = '10, 20, 30, 40, 50';
+    inputs = [10, 20, 30, 40, 50];
+  }
+  reset();
+}
+
+function handleManualInputKey(event) {
+  if (event.key === 'Enter') {
+    submitManualInput();
+  }
+}
+
+function submitManualInput() {
+  const inputField = document.getElementById('manualConsoleInput');
+  if (!inputField) return;
+
+  const val = parseInt(inputField.value.trim());
+  if (isNaN(val)) {
+    alert("Please enter a valid integer.");
+    return;
+  }
+
+  const s = steps[cur];
+  const inputIndex = s.inputIndex;
+  inputs[inputIndex] = val;
+
+  // Re-build steps based on updated inputs array
+  steps = buildSteps();
+  
+  // Re-enable controls
+  document.getElementById('nextBtn').disabled = false;
+  document.getElementById('autoBtn').disabled = false;
+  
+  // Advance immediately
+  step();
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-theme');
+  const icon = document.getElementById('themeToggleIcon');
+  const text = document.getElementById('themeToggleText');
+  if (isLight) {
+    if (icon) icon.className = 'ti ti-moon';
+    if (text) text.textContent = 'Dark Mode';
+    localStorage.setItem('theme', 'light');
+  } else {
+    if (icon) icon.className = 'ti ti-sun';
+    if (text) text.textContent = 'Light Mode';
+    localStorage.setItem('theme', 'dark');
+  }
+}
+
+// Initial setup
+(function() {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-theme');
+    window.addEventListener('DOMContentLoaded', () => {
+      const icon = document.getElementById('themeToggleIcon');
+      const text = document.getElementById('themeToggleText');
+      if (icon && text) {
+        icon.className = 'ti ti-moon';
+        text.textContent = 'Dark Mode';
+      }
+    });
+  }
+})();
+
+buildCode();
+steps = buildSteps();
+render();
+</script>
+</body>
+</html>
